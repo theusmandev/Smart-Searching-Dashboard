@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/ui-lightness/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* Scoped CSS specifically for the dashboard wrapper */
+        .dashboard-wrapper { 
+            font-family: Arial, sans-serif; 
+            background: #fff3cd; 
+            color: #333; 
+            padding: 10px;
+            margin: 0;
+            border-radius: 10px;
+        }
+        .dashboard { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: #fff3cd; 
+            border-radius: 10px; 
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+        }
+        .header { 
+            text-align: center; 
+            background: #ffd700; 
+            padding: 10px;
+            border-radius: 10px; 
+            margin-bottom: 15px; 
+            font-size: clamp(18px, 5vw, 22px);
+            font-weight: bold; 
+            color: #333; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+        }
+        /* Logo styling removed as logo is removed, but keeping CSS clean won't hurt */
+        .date-filter { 
+            text-align: center; 
+            margin-bottom: 15px; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            gap: 10px; 
+        }
+        .date-filter label { 
+            font-size: 16px; 
+        }
+        .date-filter input { 
+            width: 100%; 
+            max-width: 200px;
+            padding: 8px; 
+            font-size: 14px; 
+            box-sizing: border-box; 
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .date-filter button { 
+            padding: 8px 16px; 
+            font-size: 14px; 
+            cursor: pointer; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+        }
+        #clearFilterBtn {
+            background: #6c757d; 
+        }
+        .date-filter #totalSearches { 
+            font-size: 14px; 
+            font-weight: bold; 
+            text-align: center; 
+            width: 100%;
+        }
+        .date-filter #errorMessage { 
+            color: #dc3545;
+            font-size: 14px;
+            text-align: center;
+            width: 100%;
+            display: none;
+        }
+        .chart-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px; 
+            margin-bottom: 15px; 
+        }
+        .chart-box { 
+            background: #fff; 
+            padding: 10px;
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            overflow: hidden;
+        }
+        .chart-box h3 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 10px; 
+            font-size: clamp(14px, 4vw, 16px);
+        }
+        canvas { 
+            max-height: 250px;
+            width: 100% !important;
+        }
+        @media (max-width: 768px) { 
+            .chart-container { 
+                grid-template-columns: 1fr;
+            }
+            .header { 
+                font-size: 18px;
+                padding: 8px; 
+            }
+            .date-filter { 
+                padding: 0 10px; 
+            }
+            .date-filter input, .date-filter button { 
+                max-width: 100%;
+            }
+            .chart-box { 
+                padding: 8px; 
+            }
+            .chart-container:last-child .chart-box { 
+                grid-column: auto;
+            }
+        }
+        @media (max-width: 480px) { 
+            .dashboard { 
+                padding: 10px; 
+            }
+            .header { 
+                font-size: 16px; 
+            }
+            .date-filter label, .date-filter #totalSearches { 
+                font-size: 12px; 
+            }
+            .date-filter input, .date-filter button { 
+                font-size: 12px; 
+                padding: 6px; 
+            }
+            .button-group {
+                flex-direction: column; 
+                align-items: center;
+            }
+        }
+        .chart-box#queryChart .tick {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+
+    <div class="dashboard">
+        <div class="header">
+            Smart Urdu Novel Bank Dashboard
+            </div>
+        
+        <div class="date-filter">
+            <label for="startDate">Select Start Date:</label>
+            <input type="text" id="startDate" placeholder="Start Date (YYYY-MM-DD)" aria-label="Start Date">
+            <label for="endDate">Select End Date:</label>
+            <input type="text" id="endDate" placeholder="End Date (YYYY-MM-DD)" aria-label="End Date">
+            <div class="button-group">
+                <button id="filterBtn" aria-label="Filter data by date range">Filter</button>
+                <button id="clearFilterBtn" aria-label="Clear date filters">Clear Filter</button>
+            </div>
+            <span id="totalSearches">Total Searches: Loading...</span>
+            <span id="errorMessage"></span>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-box"><h3>Device Type Comparison</h3><canvas id="deviceChart" aria-label="Device Type Comparison Chart"></canvas></div>
+            <div class="chart-box"><h3>Monthly Total Searches</h3><canvas id="monthlyChart" aria-label="Monthly Total Searches Chart"></canvas></div>
+            <div class="chart-box"><h3>Search Success Analysis</h3><canvas id="successChart" aria-label="Search Success Analysis Chart"></canvas></div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-box"><h3>Total Searches by Date</h3><canvas id="dateChart" aria-label="Total Searches by Date Chart"></canvas></div>
+            <div class="chart-box">
+                <h3>Search Query Insights</h3>
+                <canvas id="queryChart" aria-label="Search Query Insights Chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ------------------ CONFIG ------------------
+        const SPREADSHEET_ID = '1JLumUQXKVQU7JaNCrTtxn5qkswuB6kct1TpGJq5xz3I';
+        const API_KEY = 'AIzaSyD8Xc01fWwd5CP-_DeqZ9lmnVR0i1PTPIc'; 
+        const SHEET_NAME = 'Searches';
+        const CACHE_DURATION = 5 * 60 * 1000; 
+
+        const SAMPLE_DATA = {
+            "total_searches": 1000,
+            "device_breakdown": { "mobile": 910, "desktop": 88 },
+            "searches_by_month": [
+                {"month": "Apr 2024", "value": 400},
+                {"month": "May 2024", "value": 200},
+                {"month": "Jun 2024", "value": 100},
+                {"month": "Jul 2024", "value": 300},
+                {"month": "Aug 2024", "value": 150},
+                {"month": "Sep 2024", "value": 250}
+            ],
+            "search_success": { "success": 674, "no_results": 305 },
+            "top_queries": [
+                {"query": "all novels", "count": 20},
+                {"query": "namal by nimra ahmed", "count": 15},
+                {"query": "ankaboot by noor raja poot", "count": 12},
+                {"query": "baab e dehar by mehreen sa...", "count": 10},
+                {"query": "sulphite by noor raja poot", "count": 8},
+                {"query": "ankaboot by ankaboot", "count": 6}
+            ],
+            "searches_by_date": [
+                {"date": "2024-05-01", "value": 30},
+                {"date": "2024-05-02", "value": 25},
+                {"date": "2024-05-03", "value": 25},
+                {"date": "2024-06-01", "value": 20},
+                {"date": "2024-06-02", "value": 20},
+                {"date": "2024-06-03", "value": 20},
+                {"date": "2024-07-01", "value": 15},
+                {"date": "2024-07-02", "value": 15},
+                {"date": "2024-07-03", "value": 10},
+                {"date": "2024-08-01", "value": 25},
+                {"date": "2024-08-02", "value": 25},
+                {"date": "2024-08-03", "value": 20},
+                {"date": "2024-09-01", "value": 20},
+                {"date": "2024-09-02", "value": 15},
+                {"date": "2024-09-03", "value": 15}
+            ]
+        };
+
+        let charts = {};
+
+        // ------------------ UTILITY ------------------
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        function getCachedData(start, end) {
+            const cacheKey = `dashboard_${start || 'no-start'}_${end || 'no-end'}`;
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp < CACHE_DURATION) {
+                    return data;
+                }
+            }
+            return null;
+        }
+
+        function setCachedData(start, end, data) {
+            const cacheKey = `dashboard_${start || 'no-start'}_${end || 'no-end'}`;
+            localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
+        }
+
+        // ------------------ DATA FETCH ------------------
+        async function fetchData(startDate, endDate) {
+            const cachedData = getCachedData(startDate, endDate);
+            if (cachedData) {
+                return cachedData;
+            }
+
+            const range = `${SHEET_NAME}!A:E`;
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+
+            try {
+                const response = await $.get(url);
+                const rows = response.values || [];
+                if (rows.length <= 1) throw new Error("No data in sheet");
+
+                let filteredRows = rows.slice(1);
+                if (startDate || endDate) {
+                    const start = startDate ? new Date(startDate) : new Date(0);
+                    const end = endDate ? new Date(endDate) : new Date();
+                    filteredRows = filteredRows.filter(row => {
+                        const ts = new Date(row[0]);
+                        return ts >= start && ts <= end;
+                    });
+                }
+
+                const total = filteredRows.length;
+                const mobile = filteredRows.filter(r => r[2]?.toLowerCase().includes('mobile')).length;
+                const desktop = total - mobile;
+                const noResults = filteredRows.filter(r => r[4]?.toLowerCase() === 'yes').length;
+                const success = total - noResults;
+
+                const monthly = {};
+                filteredRows.forEach(r => {
+                    const month = new Date(r[0]).toLocaleString('default', { month: 'short', year: 'numeric' });
+                    monthly[month] = (monthly[month] || 0) + 1;
+                });
+
+                const daily = {};
+                filteredRows.forEach(r => {
+                    const date = new Date(r[0]).toISOString().split('T')[0];
+                    daily[date] = (daily[date] || 0) + 1;
+                });
+
+                const queries = {};
+                filteredRows.forEach(r => {
+                    const q = (r[1] || '').trim();
+                    const short = q.length > 50 ? q.substring(0, 50) + "..." : q;
+                    queries[short] = (queries[short] || 0) + 1;
+                });
+                const topQueries = Object.entries(queries)
+                    .sort((a,b) => b[1] - a[1])
+                    .slice(0,6)
+                    .map(([q,c]) => ({query: q, count: c}));
+
+                const dateWise = Object.entries(daily).map(([d,v]) => ({date: d, value: v}));
+
+                const data = {
+                    total_searches: total,
+                    device_breakdown: { mobile, desktop },
+                    searches_by_month: Object.entries(monthly).map(([m,v]) => ({month: m, value: v})),
+                    search_success: { success, no_results: noResults },
+                    top_queries: topQueries,
+                    searches_by_date: dateWise
+                };
+
+                setCachedData(startDate, endDate, data);
+                return data;
+            } catch (error) {
+                console.error("⚠️ Data fetch failed:", error);
+                $('#errorMessage').text("Google Sheet data load failed. Showing sample data instead.").show();
+                return SAMPLE_DATA;
+            }
+        }
+
+        // ------------------ CHART RENDER ------------------
+        function updateCharts(data) {
+            const getFontSize = () => window.innerWidth <= 480 ? 10 : 12;
+
+            if (!charts.device) {
+                charts.device = new Chart(document.getElementById('deviceChart'), {
+                    type: 'pie',
+                    data: { labels: ['Mobile', 'Desktop'], datasets: [{ data: [], backgroundColor: ['#007bff', '#6c757d'] }] },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: getFontSize() } } } } }
+                });
+            }
+            charts.device.data.datasets[0].data = [data.device_breakdown.mobile, data.device_breakdown.desktop];
+            charts.device.update();
+
+            if (!charts.monthly) {
+                charts.monthly = new Chart(document.getElementById('monthlyChart'), {
+                    type: 'line',
+                    data: { labels: [], datasets: [{ label: 'Searches', data: [], borderColor: '#007bff', fill: false }] },
+                    options: { responsive: true, scales: { y: { beginAtZero: true }, x: { ticks: { font: { size: getFontSize() - 2 } } } } }
+                });
+            }
+            charts.monthly.data.labels = data.searches_by_month.map(m => m.month);
+            charts.monthly.data.datasets[0].data = data.searches_by_month.map(m => m.value);
+            charts.monthly.update();
+
+            if (!charts.success) {
+                charts.success = new Chart(document.getElementById('successChart'), {
+                    type: 'pie',
+                    data: { labels: ['Success', 'No Results'], datasets: [{ data: [], backgroundColor: ['#28a745', '#dc3545'] }] },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: getFontSize() } } } } }
+                });
+            }
+            charts.success.data.datasets[0].data = [data.search_success.success, data.search_success.no_results];
+            charts.success.update();
+
+            if (!charts.date) {
+                charts.date = new Chart(document.getElementById('dateChart'), {
+                    type: 'line',
+                    data: { labels: [], datasets: [{ label: 'Searches', data: [], borderColor: '#ffc107', fill: false }] },
+                    options: { responsive: true, scales: { y: { beginAtZero: true }, x: { ticks: { font: { size: getFontSize() - 2 } } } } }
+                });
+            }
+            charts.date.data.labels = data.searches_by_date.map(d => d.date);
+            charts.date.data.datasets[0].data = data.searches_by_date.map(d => d.value);
+            charts.date.update();
+
+            if (!charts.query) {
+                charts.query = new Chart(document.getElementById('queryChart'), {
+                    type: 'bar',
+                    data: { labels: [], datasets: [{ label: 'Count', data: [], backgroundColor: '#ffc107' }] },
+                    options: { 
+                        responsive: true, 
+                        indexAxis: 'y', 
+                        scales: { 
+                            x: { beginAtZero: true, ticks: { font: { size: getFontSize() - 2 } } }, 
+                            y: { ticks: { font: { size: getFontSize() - 2 } } } 
+                        } 
+                    }
+                });
+            }
+            charts.query.data.labels = data.top_queries.map(q => q.query);
+            charts.query.data.datasets[0].data = data.top_queries.map(q => q.count);
+            charts.query.update();
+
+            $('#totalSearches').text(`Total Searches: ${data.total_searches}`);
+        }
+
+        // ------------------ INIT ------------------
+        $(document).ready(function() {
+            $("#startDate, #endDate").datepicker({ dateFormat: 'yy-mm-dd' });
+            
+            const debouncedFilter = debounce(function() {
+                const start = $('#startDate').val();
+                const end = $('#endDate').val();
+                $('#errorMessage').hide();
+                if (start && end) {
+                    if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) {
+                        $('#errorMessage').text("Invalid date format. Use YYYY-MM-DD.").show();
+                        return;
+                    }
+                    if (new Date(start) > new Date(end)) {
+                        $('#errorMessage').text("Start date must be before or equal to end date.").show();
+                        return;
+                    }
+                }
+                loadDashboard(start, end);
+            }, 300);
+
+            $('#filterBtn').click(debouncedFilter);
+
+            $('#clearFilterBtn').click(function() {
+                $('#startDate, #endDate').val('');
+                $('#errorMessage').hide();
+                loadDashboard();
+            });
+            
+            loadDashboard();
+        });
+
+        async function loadDashboard(start, end) {
+            $('#totalSearches').html('Total Searches: Loading... <i class="fas fa-spinner fa-spin"></i>');
+            const data = await fetchData(start, end);
+            updateCharts(data);
+        }
+    </script>
+</div>
+</body>
+</html>
