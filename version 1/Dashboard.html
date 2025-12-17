@@ -314,8 +314,7 @@
                     return;
                 }
 
-                // --- 2. URDU LANGUAGE CHECK (New Feature) ---
-                // Checks for Arabic/Urdu unicode characters
+                // --- 2. URDU LANGUAGE CHECK ---
                 const urduPattern = /[\u0600-\u06FF\u0750-\u077F]/;
                 if (urduPattern.test(queryRaw)) {
                     logSearch(queryRaw + " (Urdu Input)", true);
@@ -325,23 +324,42 @@
                     <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #eff6ff; border-radius: 12px; border: 1px solid #3b82f6;">
                         <div style="font-size: 3rem; margin-bottom: 10px;">⌨️</div>
                         <h3 style="font-size: 1.6rem; margin-bottom: 10px; color: #1d4ed8; font-weight: 700;">Please Search in English</h3>
-                        <p style="color: #1e40af; font-size: 1.1rem; margin-bottom: 8px;">
-                            We only support <strong>English / Roman Urdu</strong> spellings.
-                        </p>
-                        <p style="color: #1e3a8a; font-size: 0.95rem; margin-bottom: 20px;">
-                            (Example: Type <strong>"Jannat Kay Pattay"</strong> instead of <strong>"جنت کے پتے "</strong>)
-                        </p>
-                        <button class="btn-go-back" onclick="clearSearch()" style="background: #2563eb;">
-                            Try Again
-                        </button>
+                        <p style="color: #1e40af; font-size: 1.1rem; margin-bottom: 8px;">We only support <strong>English / Roman Urdu</strong> spellings.</p>
+                        <p style="color: #1e3a8a; font-size: 0.95rem; margin-bottom: 20px;">(Example: Type <strong>"Jannat"</strong> instead of <strong>"جنت"</strong>)</p>
+                        <button class="btn-go-back" onclick="clearSearch()" style="background: #2563eb;">Try Again</button>
                     </div>`;
                     
                     document.getElementById("pagination").innerHTML = "";
                     document.getElementById("recommendedSection").style.display = "none";
                     return;
                 }
+
+                // --- 3. JUNK / SHORT SEARCH CHECK (New Feature) ---
+                if (query !== "all" && query.replace(/\s/g, '').length < 3) {
+                    logSearch(queryRaw + " (Too Short)", true);
+                    document.getElementById("resultCount").textContent = "? Unclear Search";
+
+                    grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #fef3c7; border-radius: 12px; border: 1px solid #d97706;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">🤔</div>
+                        <h3 style="font-size: 1.6rem; margin-bottom: 10px; color: #b45309; font-weight: 700;">Search Too Short</h3>
+                        <p style="color: #92400e; font-size: 1.1rem; margin-bottom: 8px;">
+                            We can't find novels with just "<strong>${queryRaw}</strong>".
+                        </p>
+                        <p style="color: #92400e; font-size: 0.95rem; margin-bottom: 20px;">
+                            Please type at least <strong>3 characters</strong> (e.g., "Namal").
+                        </p>
+                        <button class="btn-go-back" onclick="clearSearch()" style="background: #d97706;">
+                            Try Again
+                        </button>
+                    </div>`;
+
+                    document.getElementById("pagination").innerHTML = "";
+                    document.getElementById("recommendedSection").style.display = "none";
+                    return;
+                }
                 
-                // --- 3. NORMAL SEARCH ---
+                // --- 4. NORMAL SEARCH ---
                 if (!query || query === "all") { state.searchResults = shuffleArray([...state.novels]); } 
                 else { state.searchResults = state.fuse.search(query).map(r => r.item); logSearch(query, state.searchResults.length === 0); }
                 state.currentPage = 1; renderResults(); 
