@@ -212,7 +212,7 @@
         }
         .toast { background: #1f2937; color: white; padding: 12px 24px; border-radius: 50px; margin-top: 10px; opacity: 0; transform: translateY(20px); transition: 0.3s; box-shadow: var(--shadow-lg); font-size: 0.9rem; }
         .toast.show { opacity: 1; transform: translateY(0); white-space: nowrap;}
-       
+        
         @media (max-width: 600px) {
             .search-box-wrapper { padding: 3px 3px 3px 10px; gap: 2px; }
             #searchBox { padding: 6px 0px; height: 40px; font-size: 14px; }
@@ -269,11 +269,20 @@
             "romance", "kiss", "hot", "ganda", "gandi", "galat"
         ];
 
-        let state = { novels: [], fuse: null, searchResults: [], currentPage: 1, favorites: JSON.parse(localStorage.getItem("favorites") || "[]"), showFavorites: false };
+        // --- UPDATED STATE: Added lastLog to prevent duplicates ---
+        let state = { 
+            novels: [], 
+            fuse: null, 
+            searchResults: [], 
+            currentPage: 1, 
+            favorites: JSON.parse(localStorage.getItem("favorites") || "[]"), 
+            showFavorites: false,
+            lastLog: "" 
+        };
 
         (function init() { showSkeletonLoading(); fetchData(); setupEventListeners(); })();
 
-        // --- SECURITY FUNCTION (NEW) ---
+        // --- SECURITY FUNCTION ---
         function escapeHTML(str) {
             if (!str) return "";
             return str.replace(/[&<>"']/g, function(m) {
@@ -309,6 +318,10 @@
         function searchNovel() {
             const queryRaw = document.getElementById("searchBox").value.trim();
             const query = queryRaw.toLowerCase();
+            
+            // --- UX: Hide Keyboard on Mobile ---
+            document.getElementById("searchBox").blur();
+
             document.getElementById("suggestions").classList.remove("active");
             if(state.showFavorites) toggleFavorites();
             showSkeletonLoading();
@@ -319,6 +332,7 @@
                 // --- 1. SAFETY CHECK (Restricted Words) ---
                 const foundBadWord = RESTRICTED_KEYWORDS.find(word => query.includes(word));
                 if (foundBadWord) {
+                    // Always log restricted attempts
                     logSearch(queryRaw + " (Restricted)", true);
                     document.getElementById("resultCount").textContent = "🚫 Restricted";
                     
@@ -339,6 +353,7 @@
                 // --- 2. URDU LANGUAGE CHECK ---
                 const urduPattern = /[\u0600-\u06FF\u0750-\u077F]/;
                 if (urduPattern.test(queryRaw)) {
+                    // Always log Urdu attempts
                     logSearch(queryRaw + " (Urdu Input)", true);
                     document.getElementById("resultCount").textContent = "🔤 English Required";
 
@@ -356,12 +371,11 @@
                     return;
                 }
 
-                // --- 3. JUNK / SHORT SEARCH CHECK (UPDATED WITH SECURITY) ---
+                // --- 3. JUNK / SHORT SEARCH CHECK ---
                 if (query !== "" && query !== "all" && query.replace(/\s/g, '').length < 3) {
                     logSearch(queryRaw + " (Too Short)", true);
                     document.getElementById("resultCount").textContent = "? Unclear Search";
 
-                    // Note: escapeHTML is used here to prevent XSS
                     grid.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #fef3c7; border-radius: 12px; border: 1px solid #d97706;">
                         <div style="font-size: 3rem; margin-bottom: 10px;">🤔</div>
@@ -383,9 +397,20 @@
                     return;
                 }
                 
-                // --- 4. NORMAL SEARCH ---
-                if (!query || query === "all") { state.searchResults = shuffleArray([...state.novels]); } 
-                else { state.searchResults = state.fuse.search(query).map(r => r.item); logSearch(query, state.searchResults.length === 0); }
+                // --- 4. NORMAL SEARCH (Updated for Duplicate Logs) ---
+                if (!query || query === "all") { 
+                    state.searchResults = shuffleArray([...state.novels]); 
+                } 
+                else { 
+                    state.searchResults = state.fuse.search(query).map(r => r.item); 
+                    
+                    // --- NEW LOGIC TO PREVENT DUPLICATES ---
+                    // Only log if query is different from the last logged one
+                    if (query !== state.lastLog) {
+                        logSearch(query, state.searchResults.length === 0);
+                        state.lastLog = query; // Save current query
+                    }
+                }
                 state.currentPage = 1; renderResults(); 
             }, 300);
         }
@@ -417,11 +442,8 @@
                 const isFav = state.favorites.some(f => f.Titles === novel.Titles);
                 const heartIcon = isFav ? '\u2764\ufe0f' : '\uD83E\uDD0D'; 
                 
-                // --- SECURITY FIXES ---
                 const safeTitle = escapeHTML(novel.Titles);
-                // Onclick handlers ke liye quotes ko escape karna zaroori hai
                 const jsSafeTitle = novel.Titles.replace(/'/g, "\\'"); 
-                // Link validation: Must start with http or https
                 let safeLink = (novel.Links && /^https?:\/\//i.test(novel.Links)) ? novel.Links : '#';
                 const jsSafeLink = safeLink.replace(/'/g, "\\'");
 
@@ -468,11 +490,10 @@
             const results = state.fuse.search(query).slice(0, 5);
             if (results.length === 0) { box.classList.remove("active"); return; }
             
-            // --- SECURITY FIX: Escaping Suggestions ---
             box.innerHTML = results.map(r => {
                 const safeQuery = escapeHTML(query);
                 const safeTitle = escapeHTML(r.item.Titles);
-                const jsSafeTitle = r.item.Titles.replace(/'/g, "\\'"); // for onclick
+                const jsSafeTitle = r.item.Titles.replace(/'/g, "\\'"); 
                 const remainingTitle = escapeHTML(r.item.Titles.substring(query.length));
                 
                 return `<div class="suggestion-item" onclick="selectSuggestion('${jsSafeTitle}')"><span>${safeQuery}</span>${remainingTitle}</div>`;
@@ -539,7 +560,7 @@
         function clearSearch() { document.getElementById("searchBox").value = ""; state.showFavorites = false; document.getElementById("favToggle").textContent = "Show Favorites \u2764\ufe0f"; displayRandomNovels(); }
         function shuffleArray(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
         function debounce(func, wait) { let timeout; return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); }; }
-       
+        
         function startVoiceSearch() {
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SR) { showToast("Voice search not supported"); return; }
