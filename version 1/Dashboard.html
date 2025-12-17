@@ -3,463 +3,486 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Urdu Novel Bank Dashboard</title>
-
-    <!-- Libraries -->
-    <!-- Load jQuery synchronously to avoid $ undefined error -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <!-- Other libraries can remain deferred for performance -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/ui-lightness/jquery-ui.css">
-    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js" defer></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            background: #fff3cd; 
-            color: #333; 
-            padding: 10px;
-            margin: 0;
-        }
-        .dashboard { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            background: #fff3cd; 
-            border-radius: 10px; 
-            padding: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-        }
-        .header { 
-            text-align: center; 
-            background: #ffd700; 
-            padding: 10px;
-            border-radius: 10px; 
-            margin-bottom: 15px; 
-            font-size: clamp(18px, 5vw, 22px);
-            font-weight: bold; 
-            color: #333; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            flex-wrap: wrap; 
-        }
-        .header img { 
-            width: 40px;
-            height: 40px; 
-            border-radius: 50%; 
-            margin-left: 10px; 
-        }
-        .date-filter { 
-            text-align: center; 
-            margin-bottom: 15px; 
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
-            gap: 10px; 
-        }
-        .date-filter label { 
-            font-size: 16px; 
-        }
-        .date-filter input { 
-            width: 100%; 
-            max-width: 200px;
-            padding: 8px; 
-            font-size: 14px; 
-            box-sizing: border-box; 
-        }
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-        .date-filter button { 
-            padding: 8px 16px; 
-            font-size: 14px; 
-            cursor: pointer; 
-            background: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 5px; 
-        }
-        #clearFilterBtn {
-            background: #6c757d; /* Different color for clear button */
-        }
-        .date-filter #totalSearches { 
-            font-size: 14px; 
-            font-weight: bold; 
-            text-align: center; 
-            width: 100%;
-        }
-        .date-filter #errorMessage { 
-            color: #dc3545;
-            font-size: 14px;
-            text-align: center;
-            width: 100%;
-            display: none;
-        }
-        .chart-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px; 
-            margin-bottom: 15px; 
-        }
-        .chart-box { 
-            background: #fff; 
-            padding: 10px;
-            border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-            overflow: hidden;
-        }
-        .chart-box h3 { 
-            text-align: center; 
-            color: #333; 
-            margin-bottom: 10px; 
-            font-size: clamp(14px, 4vw, 16px);
-        }
-        canvas { 
-            max-height: 250px;
-            width: 100% !important;
-        }
-        @media (max-width: 768px) { 
-            .chart-container { 
-                grid-template-columns: 1fr;
-            }
-            .header { 
-                font-size: 18px;
-                padding: 8px; 
-            }
-            .header img { 
-                width: 30px;
-                height: 30px; 
-            }
-            .date-filter { 
-                padding: 0 10px; 
-            }
-            .date-filter input, .date-filter button { 
-                max-width: 100%;
-            }
-            .chart-box { 
-                padding: 8px; 
-            }
-            .chart-container:last-child .chart-box { 
-                grid-column: auto;
-            }
-        }
-        @media (max-width: 480px) { 
-            .dashboard { 
-                padding: 10px; 
-            }
-            .header { 
-                font-size: 16px; 
-            }
-            .date-filter label, .date-filter #totalSearches { 
-                font-size: 12px; 
-            }
-            .date-filter input, .date-filter button { 
-                font-size: 12px; 
-                padding: 6px; 
-            }
-            .button-group {
-                flex-direction: column; /* Stack buttons vertically on very small screens */
-                align-items: center;
-            }
-        }
-        .chart-box#queryChart .tick {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    </style>
+    <title>Document</title>
 </head>
 <body>
-    <div class="dashboard">
-        <div class="header">
-            Smart Urdu Novel Bank Dashboard 
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgByAKD7o108_AbTCLRVG6BauRijnOwFNySrHkxFx9Wa0ngpkEMm9QYnRm1pvZxhaGC0bAIhJBPKNLcKAxm5XfAfeHl__G9yJFHy5L9zBJPoPsG90NRXXzmWwxBzLC0ryceYxxyzEXVwXUActpVgY51-QXasdlnlOFqzeTQyOPhC7N0HEZMfsEQ1XWG_P5M/s320/Untitled%20design%20(2).png" alt="Urdu Novel Bank" style="vertical-align: middle; border-radius: 50%;width: 70px; height: 70px;">
-        </div>
+    <div id="novel-app-wrapper">
+
+    <style>
+        /* --- CORE VARIABLES & RESET --- */
+        #novel-app-wrapper {
+            --primary: #4f46e5;
+            --primary-dark: #db2777;
+            --secondary: #ec4899;
+            --bg-body: #f3f4f6;
+            --bg-card: #ffffff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #novel-app-wrapper * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        /* --- HEADER --- */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 20px 50px;
+            text-align: center;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .app-header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; color: white; margin-top: 0; }
+        .subtitle { opacity: 0.9; font-size: 1rem; max-width: 500px; margin: 0 auto; color: #eee; }
+
+        /* --- SEARCH BAR --- */
+        .search-container {
+            position: relative;
+            z-index: 100;
+            margin: -45px auto 20px;
+            width: 96%;
+            max-width: 800px;
+        }
+
+        .search-box-wrapper {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 8px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        #searchBox {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 20px;
+            font-size: 1rem;
+            outline: none;
+            color: var(--text-main);
+            min-width: 0;
+            caret-color: var(--primary-dark);
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 20%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+            transition: 0.2s;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .action-icon:hover { background: #db2777; transform: scale(1.05); }
+        .action-icon.mic.listening { background: #10b981; color: white; animation: pulse 1.5s infinite; }
+        .search-submit { background: var(--primary); color: white; border-radius: 10px; padding: 0 24px; width: auto; font-weight: 600; }
         
-        <div class="date-filter">
-            <label for="startDate">Select Start Date:</label>
-            <input type="text" id="startDate" placeholder="Start Date (YYYY-MM-DD)" aria-label="Start Date">
-            <label for="endDate">Select End Date:</label>
-            <input type="text" id="endDate" placeholder="End Date (YYYY-MM-DD)" aria-label="End Date">
-            <div class="button-group">
-                <button id="filterBtn" aria-label="Filter data by date range">Filter</button>
-                <button id="clearFilterBtn" aria-label="Clear date filters">Clear Filter</button>
-            </div>
-            <span id="totalSearches">Total Searches: Loading...</span>
-            <span id="errorMessage"></span>
-        </div>
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+        /* --- SUGGESTIONS --- */
+        .suggestions-box {
+            position: absolute; top: 105%; left: 15px; right: 15px;
+            background: white; border-radius: 16px; box-shadow: var(--shadow-lg);
+            overflow: hidden; display: none; max-height: 250px; overflow-y: auto;
+        }
+        .suggestions-box.active { display: block; }
+        .suggestion-item { padding: 12px 20px; border-bottom: 1px solid #f3f4f6; cursor: pointer; font-size: 1rem; }
+        .suggestion-item:hover { background: #f9fafb; color: var(--primary); font-weight: 500; }
+
+        /* --- MAIN LAYOUT --- */
+        .app-main { flex: 1; padding: 20px; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: var(--text-sub); flex-wrap: wrap; gap: 10px; }
+
+        /* --- GRID CONTAINER --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* --- CARD DESIGN --- */
+        .novel-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            border: 1px solid #e5e7eb;
+            min-height: 180px;
+        }
+
+        .novel-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+
+        .novel-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-top: 0;
+        }
+
+        .card-actions { display: flex; align-items: center; gap: 10px; margin-top: auto; width: 100%; }
+        .btn { border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+
+        .btn-download {
+            flex: 1; background: var(--primary); color: white !important; text-decoration: none; padding: 12px 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; gap: 8px;
+        }
+        .btn-download:hover { background: var(--primary-dark); }
+        .btn-download span { font-size: 1.1rem; }
+
+        .btn-secondary { background: #f3f4f6; color: #6b7280; width: 48px; height: 48px; padding: 0; flex-shrink: 0; font-size: 1.2rem; }
+        .btn-secondary:hover { background: #e5e7eb; color: var(--primary); }
+        .btn-fav.active { color: #ef4444; background: #fee2e2; }
+
+        /* --- PAGINATION --- */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 40px; flex-wrap: wrap; }
+
+        .page-btn {
+            display: flex; align-items: center; justify-content: center; min-width: 40px; height: 40px;
+            border-radius: 8px; border: 2px solid #e5e7eb; background: white; color: var(--text-main);
+            font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; padding: 0 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .page-btn:hover:not(:disabled):not(.active) { border-color: var(--primary); color: var(--primary); background: #f9fafb; }
+        .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
         
-        <div class="chart-container">
-            <div class="chart-box"><h3>Device Type Comparison</h3><canvas id="deviceChart" aria-label="Device Type Comparison Chart"></canvas></div>
-            <div class="chart-box"><h3>Monthly Total Searches</h3><canvas id="monthlyChart" aria-label="Monthly Total Searches Chart"></canvas></div>
-            <div class="chart-box"><h3>Search Success Analysis</h3><canvas id="successChart" aria-label="Search Success Analysis Chart"></canvas></div>
-        </div>
-        
-        <div class="chart-container">
-            <div class="chart-box"><h3>Total Searches by Date</h3><canvas id="dateChart" aria-label="Total Searches by Date Chart"></canvas></div>
-            <div class="chart-box">
-                <h3>Search Query Insights</h3>
-                <canvas id="queryChart" aria-label="Search Query Insights Chart"></canvas>
-            </div>
-        </div>
+        .page-btn.nav-btn { min-width: auto; padding: 0 24px; font-weight: 700; color: var(--primary); border-color: var(--primary); }
+        .page-btn.nav-btn:hover:not(:disabled) { background: var(--primary); color: white; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: #e5e7eb !important; color: var(--text-sub) !important; background: white !important; box-shadow: none; }
+
+        .pagination-ellipsis { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; font-size: 1.5rem; color: var(--text-sub); padding-bottom: 8px; }
+
+        /* --- MISC --- */
+        .fav-section-btn { display: block; margin: 0; background: white; border: 2px solid var(--secondary); color: var(--secondary); padding: 8px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+        .fav-section-btn:hover { background: var(--secondary); color: white; }
+
+        .btn-go-back {
+            background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 10px;
+            font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 15px; transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3); display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-go-back:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(219, 39, 119, 0.4); }
+
+        .skeleton { background: #e5e7eb; border-radius: 6px; animation: shimmer 1.5s infinite linear; }
+        .skeleton-text { height: 20px; width: 80%; margin-bottom: 10px; }
+        .skeleton-btn { height: 44px; width: 100%; margin-top: 15px; }
+        @keyframes shimmer { 0% { background: #e5e7eb; } 50% { background: #f3f4f6; } 100% { background: #e5e7eb; } }
+
+        .toast-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; pointer-events: none; }
+        .toast { background: #1f2937; color: white; padding: 12px 24px; border-radius: 50px; margin-top: 10px; opacity: 0; transform: translateY(20px); transition: 0.3s; box-shadow: var(--shadow-lg); font-size: 0.9rem; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+      
+        @media (max-width: 600px) {
+            .search-box-wrapper { padding: 3px 3px 3px 10px; gap: 2px; }
+            #searchBox { padding: 6px 0px; height: 40px; font-size: 14px; }
+            .action-icon { width: 28px; height: 28px; font-size: 0.8rem; margin-left: 8px; }
+            .search-submit { padding: 0 10px; font-size: 0.8rem; height: 28px; border-radius: 5px; width: auto; }
+            .novel-title { font-size: 0.95rem; -webkit-line-clamp: 3; line-height: 1.3; margin-bottom: 10px; min-height: 2.5rem; }
+            .novel-card { padding: 15px; min-height: auto; }
+        }
+    </style>
+
+    <div class="app-header">
+        <h1><i>Smart Novel Bank</i></h1>
+        <p class="subtitle">Search, discover, and download your favorite Urdu novels in PDF format.</p>
     </div>
 
-    <script>
-        // ------------------ CONFIG ------------------
-        const SPREADSHEET_ID = '1JLumUQXKVQU7JaNCrTtxn5qkswuB6kct1TpGJq5xz3I';
-        const API_KEY = 'AIzaSyD8Xc01fWwd5CP-_DeqZ9lmnVR0i1PTPIc';
-        const SHEET_NAME = 'Searches';
-        const CACHE_DURATION = 5 * 60 * 1000; // Cache for 5 minutes
+    <div class="search-container">
+        <div class="search-box-wrapper">
+            <input aria-label="Search" id="searchBox" type="text" />
+            <button aria-label="Voice Search" class="action-icon mic" onclick="startVoiceSearch()">🎙️</button>
+            <button aria-label="Clear Search" class="action-icon" onclick="clearSearch()">✕</button>
+            <button aria-label="Submit Search" class="action-icon search-submit" onclick="searchNovel()">Search</button>
+        </div>
+        <div class="suggestions-box" id="suggestions"></div>
+    </div>
 
-        const SAMPLE_DATA = {
-            "total_searches": 1000,
-            "device_breakdown": { "mobile": 910, "desktop": 88 },
-            "searches_by_month": [
-                {"month": "Apr 2024", "value": 400},
-                {"month": "May 2024", "value": 200},
-                {"month": "Jun 2024", "value": 100},
-                {"month": "Jul 2024", "value": 300},
-                {"month": "Aug 2024", "value": 150},
-                {"month": "Sep 2024", "value": 250}
-            ],
-            "search_success": { "success": 674, "no_results": 305 },
-            "top_queries": [
-                {"query": "all novels", "count": 20},
-                {"query": "namal by nimra ahmed", "count": 15},
-                {"query": "ankaboot by noor raja poot", "count": 12},
-                {"query": "baab e dehar by mehreen sa...", "count": 10},
-                {"query": "sulphite by noor raja poot", "count": 8},
-                {"query": "ankaboot by ankaboot", "count": 6}
-            ],
-            "searches_by_date": [
-                {"date": "2024-05-01", "value": 30},
-                {"date": "2024-05-02", "value": 25},
-                {"date": "2024-05-03", "value": 25},
-                {"date": "2024-06-01", "value": 20},
-                {"date": "2024-06-02", "value": 20},
-                {"date": "2024-06-03", "value": 20},
-                {"date": "2024-07-01", "value": 15},
-                {"date": "2024-07-02", "value": 15},
-                {"date": "2024-07-03", "value": 10},
-                {"date": "2024-08-01", "value": 25},
-                {"date": "2024-08-02", "value": 25},
-                {"date": "2024-08-03", "value": 20},
-                {"date": "2024-09-01", "value": 20},
-                {"date": "2024-09-02", "value": 15},
-                {"date": "2024-09-03", "value": 15}
-            ]
+    <div class="app-main">
+        <div class="controls">
+            <span id="resultCount">Loading Library...</span>
+            <button class="fav-section-btn" id="favToggle" onclick="toggleFavorites()">Show Favorites</button>
+        </div>
+
+        <div class="grid-container" id="results"></div>
+        
+        <div id="recommendedSection" style="display: none; margin-top: 30px;">
+            <h3 style="margin-bottom: 30px; text-align: center;">You Might Like</h3>
+            <div class="grid-container" id="recommendedGrid"></div>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.min.js"></script>
+    <script>
+        const CONFIG = {
+            jsonUrl: "https://cdn.jsdelivr.net/gh/theusmandev/SUNB@main/smart_urdu_novel_bank.json",
+            googleScript: "https://script.google.com/macros/s/AKfycbzuJc2bicMhDKbrBhaSQj3tKakoihMosV9F2j-HIelvyOp4YIra0fr7V7glc7tLF-N1/exec",
+            perPage: 21
         };
 
-        let charts = {};
+        const RESTRICTED_KEYWORDS = [
+            "bold", "sexy", "sex", "18+", "adult", "dirty", 
+            "romance", "romantic", "kiss", "hot", "ganda", "gandi", "galat"
+        ];
 
-        // ------------------ UTILITY ------------------
-        function debounce(func, wait) {
-            let timeout;
-            return function (...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), wait);
-            };
+        let state = { novels: [], fuse: null, searchResults: [], currentPage: 1, favorites: JSON.parse(localStorage.getItem("favorites") || "[]"), showFavorites: false };
+
+        (function init() { showSkeletonLoading(); fetchData(); setupEventListeners(); })();
+
+        function setupEventListeners() {
+            const searchBox = document.getElementById("searchBox");
+            searchBox.addEventListener("input", debounce((e) => showSuggestions(e.target.value), 300));
+            searchBox.addEventListener("keydown", (e) => { if (e.key === "Enter") { document.getElementById("suggestions").classList.remove("active"); searchNovel(); } });
+            document.addEventListener("click", (e) => { if (!document.querySelector(".search-container").contains(e.target)) { document.getElementById("suggestions").classList.remove("active"); } });
         }
 
-        function getCachedData(start, end) {
-            const cacheKey = `dashboard_${start || 'no-start'}_${end || 'no-end'}`;
-            const cached = localStorage.getItem(cacheKey);
-            if (cached) {
-                const { data, timestamp } = JSON.parse(cached);
-                if (Date.now() - timestamp < CACHE_DURATION) {
-                    return data;
+        function fetchData() {
+            if (!navigator.onLine) { document.getElementById("results").innerHTML = "<p style='text-align:center'>Please check your internet.</p>"; return; }
+            fetch(CONFIG.jsonUrl).then(res => res.json()).then(data => {
+                state.novels = data;
+                state.fuse = new Fuse(state.novels, { keys: ['Titles'], threshold: 0.3 });
+                displayRandomNovels();
+            }).catch(err => console.error(err));
+        }
+
+        function displayRandomNovels() { state.searchResults = shuffleArray([...state.novels]); state.currentPage = 1; renderResults(); }
+
+        function searchNovel() {
+            const queryRaw = document.getElementById("searchBox").value.trim();
+            const query = queryRaw.toLowerCase();
+            document.getElementById("suggestions").classList.remove("active");
+            if(state.showFavorites) toggleFavorites();
+            showSkeletonLoading();
+
+            setTimeout(() => {
+                const grid = document.getElementById("results");
+
+                // --- 1. SAFETY CHECK (Restricted Words) ---
+                const foundBadWord = RESTRICTED_KEYWORDS.find(word => query.includes(word));
+                if (foundBadWord) {
+                    logSearch(queryRaw + " (Restricted)", true);
+                    document.getElementById("resultCount").textContent = "🚫 Restricted";
+                    
+                    grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #fee2e2; border-radius: 12px; border: 1px solid #ef4444;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">🛡️</div>
+                        <h3 style="font-size: 1.6rem; margin-bottom: 10px; color: #b91c1c; font-weight: 700;">Search Restricted</h3>
+                        <p style="color: #7f1d1d; font-size: 1.1rem; margin-bottom: 8px;">We maintain a <strong>Clean & Family-Friendly</strong> environment.</p>
+                        <p style="color: #991b1b; font-size: 0.95rem;">Please search for decent Urdu novels only.</p>
+                        <button class="btn-go-back" onclick="clearSearch()" style="background: #dc2626; margin-top: 25px;">Clear Search</button>
+                    </div>`;
+
+                    document.getElementById("pagination").innerHTML = "";
+                    document.getElementById("recommendedSection").style.display = "none";
+                    return;
                 }
-            }
-            return null;
-        }
 
-        function setCachedData(start, end, data) {
-            const cacheKey = `dashboard_${start || 'no-start'}_${end || 'no-end'}`;
-            localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
-        }
+                // --- 2. URDU LANGUAGE CHECK (New Feature) ---
+                // Checks for Arabic/Urdu unicode characters
+                const urduPattern = /[\u0600-\u06FF\u0750-\u077F]/;
+                if (urduPattern.test(queryRaw)) {
+                    logSearch(queryRaw + " (Urdu Input)", true);
+                    document.getElementById("resultCount").textContent = "🔤 English Required";
 
-        // ------------------ DATA FETCH ------------------
-        async function fetchData(startDate, endDate) {
-            const cachedData = getCachedData(startDate, endDate);
-            if (cachedData) {
-                return cachedData;
-            }
-
-            const range = `${SHEET_NAME}!A:E`;
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
-
-            try {
-                const response = await $.get(url);
-                const rows = response.values || [];
-                if (rows.length <= 1) throw new Error("No data in sheet");
-
-                let filteredRows = rows.slice(1);
-                if (startDate || endDate) {
-                    const start = startDate ? new Date(startDate) : new Date(0);
-                    const end = endDate ? new Date(endDate) : new Date();
-                    filteredRows = filteredRows.filter(row => {
-                        const ts = new Date(row[0]);
-                        return ts >= start && ts <= end;
-                    });
+                    grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #eff6ff; border-radius: 12px; border: 1px solid #3b82f6;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">⌨️</div>
+                        <h3 style="font-size: 1.6rem; margin-bottom: 10px; color: #1d4ed8; font-weight: 700;">Please Search in English</h3>
+                        <p style="color: #1e40af; font-size: 1.1rem; margin-bottom: 8px;">
+                            We only support <strong>English / Roman Urdu</strong> spellings.
+                        </p>
+                        <p style="color: #1e3a8a; font-size: 0.95rem; margin-bottom: 20px;">
+                            (Example: Type <strong>"Jannat Kay Pattay"</strong> instead of <strong>"جنت کے پتے "</strong>)
+                        </p>
+                        <button class="btn-go-back" onclick="clearSearch()" style="background: #2563eb;">
+                            Try Again
+                        </button>
+                    </div>`;
+                    
+                    document.getElementById("pagination").innerHTML = "";
+                    document.getElementById("recommendedSection").style.display = "none";
+                    return;
                 }
-
-                const total = filteredRows.length;
-                const mobile = filteredRows.filter(r => r[2]?.toLowerCase().includes('mobile')).length;
-                const desktop = total - mobile;
-                const noResults = filteredRows.filter(r => r[4]?.toLowerCase() === 'yes').length;
-                const success = total - noResults;
-
-                const monthly = {};
-                filteredRows.forEach(r => {
-                    const month = new Date(r[0]).toLocaleString('default', { month: 'short', year: 'numeric' });
-                    monthly[month] = (monthly[month] || 0) + 1;
-                });
-
-                const daily = {};
-                filteredRows.forEach(r => {
-                    const date = new Date(r[0]).toISOString().split('T')[0];
-                    daily[date] = (daily[date] || 0) + 1;
-                });
-
-                const queries = {};
-                filteredRows.forEach(r => {
-                    const q = (r[1] || '').trim();
-                    const short = q.length > 50 ? q.substring(0, 50) + "..." : q;
-                    queries[short] = (queries[short] || 0) + 1;
-                });
-                const topQueries = Object.entries(queries)
-                    .sort((a,b) => b[1] - a[1])
-                    .slice(0,6)
-                    .map(([q,c]) => ({query: q, count: c}));
-
-                const dateWise = Object.entries(daily).map(([d,v]) => ({date: d, value: v}));
-
-                const data = {
-                    total_searches: total,
-                    device_breakdown: { mobile, desktop },
-                    searches_by_month: Object.entries(monthly).map(([m,v]) => ({month: m, value: v})),
-                    search_success: { success, no_results: noResults },
-                    top_queries: topQueries,
-                    searches_by_date: dateWise
-                };
-
-                setCachedData(startDate, endDate, data);
-                return data;
-            } catch (error) {
-                console.error("⚠️ Data fetch failed:", error);
-                $('#errorMessage').text("Google Sheet data load failed. Showing sample data instead.").show();
-                return SAMPLE_DATA;
-            }
-        }
-
-        // ------------------ CHART RENDER ------------------
-        function updateCharts(data) {
-            const getFontSize = () => window.innerWidth <= 480 ? 10 : 12;
-
-            if (!charts.device) {
-                charts.device = new Chart(document.getElementById('deviceChart'), {
-                    type: 'pie',
-                    data: { labels: ['Mobile', 'Desktop'], datasets: [{ data: [], backgroundColor: ['#007bff', '#6c757d'] }] },
-                    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: getFontSize() } } } } }
-                });
-            }
-            charts.device.data.datasets[0].data = [data.device_breakdown.mobile, data.device_breakdown.desktop];
-            charts.device.update();
-
-            if (!charts.monthly) {
-                charts.monthly = new Chart(document.getElementById('monthlyChart'), {
-                    type: 'line',
-                    data: { labels: [], datasets: [{ label: 'Searches', data: [], borderColor: '#007bff', fill: false }] },
-                    options: { responsive: true, scales: { y: { beginAtZero: true }, x: { ticks: { font: { size: getFontSize() - 2 } } } } }
-                });
-            }
-            charts.monthly.data.labels = data.searches_by_month.map(m => m.month);
-            charts.monthly.data.datasets[0].data = data.searches_by_month.map(m => m.value);
-            charts.monthly.update();
-
-            if (!charts.success) {
-                charts.success = new Chart(document.getElementById('successChart'), {
-                    type: 'pie',
-                    data: { labels: ['Success', 'No Results'], datasets: [{ data: [], backgroundColor: ['#28a745', '#dc3545'] }] },
-                    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: getFontSize() } } } } }
-                });
-            }
-            charts.success.data.datasets[0].data = [data.search_success.success, data.search_success.no_results];
-            charts.success.update();
-
-            if (!charts.date) {
-                charts.date = new Chart(document.getElementById('dateChart'), {
-                    type: 'line',
-                    data: { labels: [], datasets: [{ label: 'Searches', data: [], borderColor: '#ffc107', fill: false }] },
-                    options: { responsive: true, scales: { y: { beginAtZero: true }, x: { ticks: { font: { size: getFontSize() - 2 } } } } }
-                });
-            }
-            charts.date.data.labels = data.searches_by_date.map(d => d.date);
-            charts.date.data.datasets[0].data = data.searches_by_date.map(d => d.value);
-            charts.date.update();
-
-            if (!charts.query) {
-                charts.query = new Chart(document.getElementById('queryChart'), {
-                    type: 'bar',
-                    data: { labels: [], datasets: [{ label: 'Count', data: [], backgroundColor: '#ffc107' }] },
-                    options: { 
-                        responsive: true, 
-                        indexAxis: 'y', 
-                        scales: { 
-                            x: { beginAtZero: true, ticks: { font: { size: getFontSize() - 2 } } }, 
-                            y: { ticks: { font: { size: getFontSize() - 2 } } } 
-                        } 
-                    }
-                });
-            }
-            charts.query.data.labels = data.top_queries.map(q => q.query);
-            charts.query.data.datasets[0].data = data.top_queries.map(q => q.count);
-            charts.query.update();
-
-            $('#totalSearches').text(`Total Searches: ${data.total_searches}`);
-        }
-
-        // ------------------ INIT ------------------
-        $(document).ready(function() {
-            $("#startDate, #endDate").datepicker({ dateFormat: 'yy-mm-dd' });
-            
-            const debouncedFilter = debounce(function() {
-                const start = $('#startDate').val();
-                const end = $('#endDate').val();
-                $('#errorMessage').hide();
-                if (start && end) {
-                    if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) {
-                        $('#errorMessage').text("Invalid date format. Use YYYY-MM-DD.").show();
-                        return;
-                    }
-                    if (new Date(start) > new Date(end)) {
-                        $('#errorMessage').text("Start date must be before or equal to end date.").show();
-                        return;
-                    }
-                }
-                loadDashboard(start, end);
+                
+                // --- 3. NORMAL SEARCH ---
+                if (!query || query === "all") { state.searchResults = shuffleArray([...state.novels]); } 
+                else { state.searchResults = state.fuse.search(query).map(r => r.item); logSearch(query, state.searchResults.length === 0); }
+                state.currentPage = 1; renderResults(); 
             }, 300);
+        }
 
-            $('#filterBtn').click(debouncedFilter);
+        function showSkeletonLoading() {
+            const grid = document.getElementById("results");
+            grid.innerHTML = "";
+            for(let i=0; i<6; i++) {
+                grid.innerHTML += `<div class="novel-card"><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text" style="width: 60%"></div><div class="skeleton skeleton-btn"></div></div>`;
+            }
+        }
 
-            $('#clearFilterBtn').click(function() {
-                $('#startDate, #endDate').val('');
-                $('#errorMessage').hide();
-                loadDashboard();
+        function renderResults() {
+            const grid = document.getElementById("results");
+            document.getElementById("recommendedSection").style.display = "none";
+            grid.innerHTML = "";
+            const total = state.searchResults.length;
+            document.getElementById("resultCount").textContent = `${state.showFavorites ? 'Favorite' : 'Found'} Novels: ${total}`;
+
+            if (total === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;"><h3 style="font-size: 1.5rem; margin-bottom: 10px;">No novels found 😕</h3><p style="color: var(--text-sub); margin-bottom: 20px;">Check spelling or try using voice search.</p><button class="btn-go-back" onclick="clearSearch()"><span>⬅</span> Go Back to Library</button></div>`;
+                showRecommendations(); document.getElementById("pagination").innerHTML = ""; return;
+            }
+
+            const start = (state.currentPage - 1) * CONFIG.perPage;
+            const pageData = state.searchResults.slice(start, start + CONFIG.perPage);
+
+            pageData.forEach(novel => {
+                const isFav = state.favorites.some(f => f.Titles === novel.Titles);
+                const heartIcon = isFav ? '\u2764\ufe0f' : '\uD83E\uDD0D'; 
+                grid.innerHTML += `<article class="novel-card"><h2 class="novel-title" title="${novel.Titles}">${novel.Titles}</h2><div class="card-actions"><button class="btn btn-secondary btn-fav ${isFav ? 'active' : ''}" onclick="toggleFav('${novel.Titles}', '${novel.Links}', this)">${heartIcon}</button><button class="btn btn-secondary" onclick="shareNovel('${novel.Titles}', '${novel.Links}')">🔗</button><a href="${novel.Links}" target="_blank" class="btn btn-download"><span>📥</span> Download PDF</a></div></article>`;
             });
-            
-            loadDashboard();
-        });
 
-        async function loadDashboard(start, end) {
-            $('#totalSearches').html('Total Searches: Loading... <i class="fas fa-spinner fa-spin"></i>');
-            const data = await fetchData(start, end);
-            updateCharts(data);
+            renderPagination(Math.ceil(total / CONFIG.perPage));
+            if(window.scrollY > 300 && document.getElementById("novel-app-wrapper")) document.getElementById("novel-app-wrapper").scrollIntoView({behavior: 'smooth'});
+        }
+
+        function showRecommendations() {
+            const recSection = document.getElementById("recommendedSection");
+            const recGrid = document.getElementById("recommendedGrid");
+            recSection.style.display = "block"; recGrid.innerHTML = "";
+            shuffleArray([...state.novels]).slice(0, 10).forEach(novel => {
+                recGrid.innerHTML += `<div class="novel-card" style="opacity: 0.9"><h2 class="novel-title" title="${novel.Titles}">${novel.Titles}</h2><div class="card-actions"><a href="${novel.Links}" target="_blank" class="btn btn-download"><span>📥</span> Download PDF</a></div></div>`;
+            });
+        }
+
+        function showSuggestions(query) {
+            const box = document.getElementById("suggestions");
+            if (!query) { box.classList.remove("active"); return; }
+            const isRestricted = RESTRICTED_KEYWORDS.some(word => query.toLowerCase().includes(word));
+            if (isRestricted) { box.classList.remove("active"); return; }
+            const results = state.fuse.search(query).slice(0, 5);
+            if (results.length === 0) { box.classList.remove("active"); return; }
+            box.innerHTML = results.map(r => `<div class="suggestion-item" onclick="selectSuggestion('${r.item.Titles}')"><span>${query}</span>${r.item.Titles.substring(query.length)}</div>`).join("");
+            box.classList.add("active");
+        }
+
+        function selectSuggestion(title) { document.getElementById("searchBox").value = title; searchNovel(); }
+
+        function toggleFav(title, link, btn) {
+            const idx = state.favorites.findIndex(f => f.Titles === title);
+            if (idx === -1) { state.favorites.push({ Titles: title, Links: link }); btn.classList.add("active"); btn.textContent = "\u2764\ufe0f"; showToast("Saved to favorites"); } 
+            else { state.favorites.splice(idx, 1); btn.classList.remove("active"); btn.textContent = "\uD83E\uDD0D"; showToast("Removed from favorites"); if(state.showFavorites) { state.searchResults = state.favorites; renderResults(); } }
+            localStorage.setItem("favorites", JSON.stringify(state.favorites));
+        }
+
+        function toggleFavorites() {
+            state.showFavorites = !state.showFavorites;
+            const btn = document.getElementById("favToggle");
+            if (state.showFavorites) { state.searchResults = state.favorites; btn.textContent = "👉 Show All Novels"; btn.style.background = "var(--secondary)"; btn.style.color = "white"; } 
+            else { state.searchResults = shuffleArray([...state.novels]); btn.textContent = "Show Favorites \u2764\ufe0f"; btn.style.background = "white"; btn.style.color = "var(--secondary)"; }
+            state.currentPage = 1; renderResults();
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div"); toast.className = "toast"; toast.textContent = msg; container.appendChild(toast);
+            setTimeout(() => toast.classList.add("show"), 10);
+            setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        function shareNovel(title, link) {
+            if (navigator.share) navigator.share({ title: title, text: `Read ${title}`, url: link });
+            else { navigator.clipboard.writeText(link); showToast("Link copied!"); }
+        }
+
+        function renderPagination(totalPages) {
+            const div = document.getElementById("pagination");
+            div.innerHTML = "";
+            if (totalPages <= 1) return;
+            const { currentPage } = state;
+            const createBtn = (page, text, isNav = false, isDisabled = false) => {
+                const btn = document.createElement("button");
+                btn.className = `page-btn ${isNav ? 'nav-btn' : ''} ${page === currentPage && !isNav ? 'active' : ''}`;
+                btn.textContent = text || page;
+                btn.disabled = isDisabled;
+                if (!isDisabled) { btn.onclick = () => { state.currentPage = page; renderResults(); document.getElementById("novel-app-wrapper").scrollIntoView({ behavior: 'smooth' }); }; }
+                return btn;
+            };
+            const createEllipsis = () => { const span = document.createElement("span"); span.className = "pagination-ellipsis"; span.innerHTML = "&hellip;"; return span; };
+
+            div.appendChild(createBtn(currentPage - 1, "Prev", true, currentPage === 1));
+            const pages = []; pages.push(1);
+            let start = Math.max(2, currentPage - 1); let end = Math.min(totalPages - 1, currentPage + 1);
+            if (start > 2) pages.push('...');
+            for (let i = start; i <= end; i++) { if (i > 1 && i < totalPages) pages.push(i); }
+            if (end < totalPages - 1) pages.push('...');
+            if (totalPages > 1) pages.push(totalPages);
+            pages.forEach(page => { if (page === '...') div.appendChild(createEllipsis()); else div.appendChild(createBtn(page)); });
+            div.appendChild(createBtn(currentPage + 1, "Next", true, currentPage === totalPages));
+        }
+
+        function clearSearch() { document.getElementById("searchBox").value = ""; state.showFavorites = false; document.getElementById("favToggle").textContent = "Show Favorites \u2764\ufe0f"; displayRandomNovels(); }
+        function shuffleArray(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+        function debounce(func, wait) { let timeout; return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); }; }
+      
+        function startVoiceSearch() {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) { showToast("Voice search not supported"); return; }
+            const r = new SR();
+            r.onstart = () => { document.getElementById("searchBox").placeholder = "Listening..."; document.querySelector(".mic").classList.add("listening"); };
+            r.onend = () => { document.getElementById("searchBox").placeholder = "Search novel title..."; document.querySelector(".mic").classList.remove("listening"); };
+            r.onresult = (e) => { const transcript = e.results[0][0].transcript; document.getElementById("searchBox").value = transcript; searchNovel(); };
+            r.start();
+        }
+
+        function getUserId() {
+            let id = localStorage.getItem("nb_user_id");
+            if (!id) { id = 'user_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5); localStorage.setItem("nb_user_id", id); }
+            return id;
+        }
+
+        function logSearch(q, n) { 
+            const userId = getUserId();
+            const deviceType = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? "Mobile" : "Desktop";
+            const params = new URLSearchParams({ search: q, timestamp: new Date().toISOString(), noResults: n, device: deviceType, userId: userId });
+            fetch(CONFIG.googleScript, { method: 'POST', body: params }).catch(e => {}); 
         }
     </script>
+</div>
 </body>
 </html>
