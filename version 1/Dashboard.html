@@ -202,7 +202,15 @@
         .skeleton-btn { height: 44px; width: 100%; margin-top: 15px; }
         @keyframes shimmer { 0% { background: #e5e7eb; } 50% { background: #f3f4f6; } 100% { background: #e5e7eb; } }
 
-        .toast-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; pointer-events: none; }
+   /* Purana code: position: absolute; */
+.toast-container { 
+    position: fixed; /* Ye change karein */
+    bottom: 30px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    z-index: 9999; /* Z-index thora barha dein */
+    pointer-events: none; 
+}
         .toast { background: #1f2937; color: white; padding: 12px 24px; border-radius: 50px; margin-top: 10px; opacity: 0; transform: translateY(20px); transition: 0.3s; box-shadow: var(--shadow-lg); font-size: 0.9rem; }
         .toast.show { opacity: 1; transform: translateY(0); }
       
@@ -223,7 +231,7 @@
 
     <div class="search-container">
         <div class="search-box-wrapper">
-            <input aria-label="Search" id="searchBox" type="text" />
+            <input aria-label="Search" id="searchBox" type="text" placeholder="Search novel title..." />
             <button aria-label="Voice Search" class="action-icon mic" onclick="startVoiceSearch()">🎙️</button>
             <button aria-label="Clear Search" class="action-icon" onclick="clearSearch()">✕</button>
             <button aria-label="Submit Search" class="action-icon search-submit" onclick="searchNovel()">Search</button>
@@ -334,8 +342,9 @@
                     return;
                 }
 
-                // --- 3. JUNK / SHORT SEARCH CHECK (New Feature) ---
-                if (query !== "all" && query.replace(/\s/g, '').length < 3) {
+                // --- 3. JUNK / SHORT SEARCH CHECK (Updated) ---
+                // Yahan change kiya hai: query !== "" add kiya hai
+                if (query !== "" && query !== "all" && query.replace(/\s/g, '').length < 3) {
                     logSearch(queryRaw + " (Too Short)", true);
                     document.getElementById("resultCount").textContent = "? Unclear Search";
 
