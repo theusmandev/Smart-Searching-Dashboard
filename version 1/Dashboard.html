@@ -202,18 +202,17 @@
         .skeleton-btn { height: 44px; width: 100%; margin-top: 15px; }
         @keyframes shimmer { 0% { background: #e5e7eb; } 50% { background: #f3f4f6; } 100% { background: #e5e7eb; } }
 
-   /* Purana code: position: absolute; */
-.toast-container { 
-    position: fixed; /* Ye change karein */
-    bottom: 30px; 
-    left: 50%; 
-    transform: translateX(-50%); 
-    z-index: 9999; /* Z-index thora barha dein */
-    pointer-events: none; 
-}
+        .toast-container { 
+            position: fixed; 
+            bottom: 80px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 9999; 
+            pointer-events: none; 
+        }
         .toast { background: #1f2937; color: white; padding: 12px 24px; border-radius: 50px; margin-top: 10px; opacity: 0; transform: translateY(20px); transition: 0.3s; box-shadow: var(--shadow-lg); font-size: 0.9rem; }
-        .toast.show { opacity: 1; transform: translateY(0); }
-      
+        .toast.show { opacity: 1; transform: translateY(0); white-space: nowrap;}
+       
         @media (max-width: 600px) {
             .search-box-wrapper { padding: 3px 3px 3px 10px; gap: 2px; }
             #searchBox { padding: 6px 0px; height: 40px; font-size: 14px; }
@@ -267,12 +266,27 @@
 
         const RESTRICTED_KEYWORDS = [
             "bold", "sexy", "sex", "18+", "adult", "dirty", 
-            "romance", "romantic", "kiss", "hot", "ganda", "gandi", "galat"
+            "romance", "kiss", "hot", "ganda", "gandi", "galat"
         ];
 
         let state = { novels: [], fuse: null, searchResults: [], currentPage: 1, favorites: JSON.parse(localStorage.getItem("favorites") || "[]"), showFavorites: false };
 
         (function init() { showSkeletonLoading(); fetchData(); setupEventListeners(); })();
+
+        // --- SECURITY FUNCTION (NEW) ---
+        function escapeHTML(str) {
+            if (!str) return "";
+            return str.replace(/[&<>"']/g, function(m) {
+                switch (m) {
+                    case '&': return '&amp;';
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '"': return '&quot;';
+                    case "'": return '&#039;';
+                    default: return m;
+                }
+            });
+        }
 
         function setupEventListeners() {
             const searchBox = document.getElementById("searchBox");
@@ -311,7 +325,7 @@
                     grid.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #fee2e2; border-radius: 12px; border: 1px solid #ef4444;">
                         <div style="font-size: 3rem; margin-bottom: 10px;">🛡️</div>
-                        <h3 style="font-size: 1.6rem; margin-bottom: 10px; color: #b91c1c; font-weight: 700;">Search Restricted</h3>
+                        <h3 style="font-size: 1.6rem; margin-bottom: 10px; color: #b91c1c; font-weight: 700;">Search Restricted</h3><br>
                         <p style="color: #7f1d1d; font-size: 1.1rem; margin-bottom: 8px;">We maintain a <strong>Clean & Family-Friendly</strong> environment.</p>
                         <p style="color: #991b1b; font-size: 0.95rem;">Please search for decent Urdu novels only.</p>
                         <button class="btn-go-back" onclick="clearSearch()" style="background: #dc2626; margin-top: 25px;">Clear Search</button>
@@ -342,18 +356,19 @@
                     return;
                 }
 
-                // --- 3. JUNK / SHORT SEARCH CHECK (Updated) ---
-                // Yahan change kiya hai: query !== "" add kiya hai
+                // --- 3. JUNK / SHORT SEARCH CHECK (UPDATED WITH SECURITY) ---
                 if (query !== "" && query !== "all" && query.replace(/\s/g, '').length < 3) {
                     logSearch(queryRaw + " (Too Short)", true);
                     document.getElementById("resultCount").textContent = "? Unclear Search";
 
+                    // Note: escapeHTML is used here to prevent XSS
                     grid.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #fef3c7; border-radius: 12px; border: 1px solid #d97706;">
                         <div style="font-size: 3rem; margin-bottom: 10px;">🤔</div>
+                        <br>
                         <h3 style="font-size: 1.6rem; margin-bottom: 10px; color: #b45309; font-weight: 700;">Search Too Short</h3>
                         <p style="color: #92400e; font-size: 1.1rem; margin-bottom: 8px;">
-                            We can't find novels with just "<strong>${queryRaw}</strong>".
+                            We can't find novels with just "<strong>${escapeHTML(queryRaw)}</strong>".
                         </p>
                         <p style="color: #92400e; font-size: 0.95rem; margin-bottom: 20px;">
                             Please type at least <strong>3 characters</strong> (e.g., "Namal").
@@ -401,7 +416,24 @@
             pageData.forEach(novel => {
                 const isFav = state.favorites.some(f => f.Titles === novel.Titles);
                 const heartIcon = isFav ? '\u2764\ufe0f' : '\uD83E\uDD0D'; 
-                grid.innerHTML += `<article class="novel-card"><h2 class="novel-title" title="${novel.Titles}">${novel.Titles}</h2><div class="card-actions"><button class="btn btn-secondary btn-fav ${isFav ? 'active' : ''}" onclick="toggleFav('${novel.Titles}', '${novel.Links}', this)">${heartIcon}</button><button class="btn btn-secondary" onclick="shareNovel('${novel.Titles}', '${novel.Links}')">🔗</button><a href="${novel.Links}" target="_blank" class="btn btn-download"><span>📥</span> Download PDF</a></div></article>`;
+                
+                // --- SECURITY FIXES ---
+                const safeTitle = escapeHTML(novel.Titles);
+                // Onclick handlers ke liye quotes ko escape karna zaroori hai
+                const jsSafeTitle = novel.Titles.replace(/'/g, "\\'"); 
+                // Link validation: Must start with http or https
+                let safeLink = (novel.Links && /^https?:\/\//i.test(novel.Links)) ? novel.Links : '#';
+                const jsSafeLink = safeLink.replace(/'/g, "\\'");
+
+                grid.innerHTML += `
+                <article class="novel-card">
+                    <h2 class="novel-title" title="${safeTitle}">${safeTitle}</h2>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary btn-fav ${isFav ? 'active' : ''}" onclick="toggleFav('${jsSafeTitle}', '${jsSafeLink}', this)">${heartIcon}</button>
+                        <button class="btn btn-secondary" onclick="shareNovel('${jsSafeTitle}', '${jsSafeLink}')">🔗</button>
+                        <a href="${safeLink}" target="_blank" class="btn btn-download"><span>📥</span> Download PDF</a>
+                    </div>
+                </article>`;
             });
 
             renderPagination(Math.ceil(total / CONFIG.perPage));
@@ -412,8 +444,18 @@
             const recSection = document.getElementById("recommendedSection");
             const recGrid = document.getElementById("recommendedGrid");
             recSection.style.display = "block"; recGrid.innerHTML = "";
+            
             shuffleArray([...state.novels]).slice(0, 10).forEach(novel => {
-                recGrid.innerHTML += `<div class="novel-card" style="opacity: 0.9"><h2 class="novel-title" title="${novel.Titles}">${novel.Titles}</h2><div class="card-actions"><a href="${novel.Links}" target="_blank" class="btn btn-download"><span>📥</span> Download PDF</a></div></div>`;
+                const safeTitle = escapeHTML(novel.Titles);
+                let safeLink = (novel.Links && /^https?:\/\//i.test(novel.Links)) ? novel.Links : '#';
+
+                recGrid.innerHTML += `
+                <div class="novel-card" style="opacity: 0.9">
+                    <h2 class="novel-title" title="${safeTitle}">${safeTitle}</h2>
+                    <div class="card-actions">
+                        <a href="${safeLink}" target="_blank" class="btn btn-download"><span>📥</span> Download PDF</a>
+                    </div>
+                </div>`;
             });
         }
 
@@ -422,9 +464,20 @@
             if (!query) { box.classList.remove("active"); return; }
             const isRestricted = RESTRICTED_KEYWORDS.some(word => query.toLowerCase().includes(word));
             if (isRestricted) { box.classList.remove("active"); return; }
+            
             const results = state.fuse.search(query).slice(0, 5);
             if (results.length === 0) { box.classList.remove("active"); return; }
-            box.innerHTML = results.map(r => `<div class="suggestion-item" onclick="selectSuggestion('${r.item.Titles}')"><span>${query}</span>${r.item.Titles.substring(query.length)}</div>`).join("");
+            
+            // --- SECURITY FIX: Escaping Suggestions ---
+            box.innerHTML = results.map(r => {
+                const safeQuery = escapeHTML(query);
+                const safeTitle = escapeHTML(r.item.Titles);
+                const jsSafeTitle = r.item.Titles.replace(/'/g, "\\'"); // for onclick
+                const remainingTitle = escapeHTML(r.item.Titles.substring(query.length));
+                
+                return `<div class="suggestion-item" onclick="selectSuggestion('${jsSafeTitle}')"><span>${safeQuery}</span>${remainingTitle}</div>`;
+            }).join("");
+            
             box.classList.add("active");
         }
 
@@ -486,7 +539,7 @@
         function clearSearch() { document.getElementById("searchBox").value = ""; state.showFavorites = false; document.getElementById("favToggle").textContent = "Show Favorites \u2764\ufe0f"; displayRandomNovels(); }
         function shuffleArray(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
         function debounce(func, wait) { let timeout; return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); }; }
-      
+       
         function startVoiceSearch() {
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SR) { showToast("Voice search not supported"); return; }
